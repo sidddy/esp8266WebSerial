@@ -112,7 +112,7 @@ void serialEvent() {
   while (Serial.available()) {
     inputString += Serial.readString();
     if (inputString.length() > 32768) {
-     inputString = "<<<<< CUT >>>>>\n"
+     inputString = "<<<<< CUT >>>>>\n";
     }
   }
 }
