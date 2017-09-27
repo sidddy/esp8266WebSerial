@@ -17,6 +17,8 @@ const char* password = "YourWifiPassword";
 ESP8266WebServer server(80); //change to your desired port, 80 is standard http
 
 String webString="";     // String to display
+String inputString = "";         // a string to hold incoming data
+
  
 void handle_root() {
   //Serial.print(".");
@@ -91,9 +93,9 @@ void setup(void)
      if (server.hasArg("text")) {
       Serial.println(server.arg("text"));
       }
-    webString="";  
-    if (Serial.available()) { webString = Serial.readString(); }
-    server.send(200, "text/plain", webString);
+
+    server.send(200, "text/plain", inputString);
+    inputString = "";
   });
 
 //Anything can send data to the serial device by hitting 
@@ -105,12 +107,21 @@ void setup(void)
   server.begin();
 //  Serial.println("HTTP server started");
 }
+
+void serialEvent() {
+  while (Serial.available()) {
+    inputString += Serial.readString();
+    if (inputString.length() > 32768) {
+     inputString = "<<<<< CUT >>>>>\n"
+    }
+  }
+}
  
 void loop(void)
 {
+  serialEvent();
   server.handleClient();
   if (WiFi.status() != WL_CONNECTED) {
-//    Serial.print("!");
     WiFi.begin(ssid, password);
     delay(5000);
     }
